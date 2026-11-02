@@ -1,5 +1,8 @@
 Software Requirements Specification (SRS)
 
+Executive Summary:
+This Software Requirements Specification (SRS) outlines the functional and non-functional requirements for the Dengue Dashboard & Analytics System. It details system boundaries, user interactions, REST API requirements, data processing pipelines, and security protocols across both MVP (Mid-term) and Beta (Final) releases.
+
 1. Introduction
 This document defines the functional and non-functional requirements for the Dengue Dashboard web application.
 
