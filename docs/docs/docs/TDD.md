@@ -1,5 +1,8 @@
 Technical Design Document (TDD)
 
+Executive Summary:
+The Technical Design Document (TDD) defines the architecture of the Dengue Dashboard system. Built with a FastAPI backend and a React + TypeScript frontend, the application utilizes PostgreSQL for data persistence, GeoJSON for map rendering, and Docker for containerized deployment across MVP and Beta phases.
+
 1. System Architecture Overview
 The system follows a modern decoupled Client-Server architecture (Monorepo setup).
 

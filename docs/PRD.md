@@ -1,5 +1,9 @@
 Product Requirements Document (PRD)
 
+
+Executive Summary:
+The Dengue Dashboard is a web-based analytics platform designed to monitor, analyze, and visualize dengue outbreak data. The system enables public health officials and general users to track infection counts, identify geographical hotspots, and access trend predictions to improve resource allocation and preventive measures.
+
 1. Project Title
 Dengue Dashboard & Analytics System
 
