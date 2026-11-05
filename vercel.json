@@ -15,6 +15,14 @@
   ],
   "routes": [
     {
+      "src": "/api/docs",
+      "dest": "backend/app/main.py"
+    },
+    {
+      "src": "/api/openapi.json",
+      "dest": "backend/app/main.py"
+    },
+    {
       "src": "/api/(.*)",
       "dest": "backend/app/main.py"
     },
