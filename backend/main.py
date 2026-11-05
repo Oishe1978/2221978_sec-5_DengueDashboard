@@ -11,10 +11,11 @@ from app.database import create_db_and_tables
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
+   
     try:
         create_db_and_tables()
     except Exception as e:
-        print(f"Database setup error (ignored for server stability): {e}")
+        print(f"Database setup note: {e}")
     yield
 
 
@@ -26,6 +27,7 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+# CORS configuration 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -34,7 +36,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(cases_router)
+# API Routers
+app.include_router(cases_router, prefix="/api")
 
 
 @app.get("/api/health")
@@ -42,12 +45,9 @@ def health() -> dict[str, str]:
     return {"status": "ok"}
 
 
-@app.get("/api/hello")
-def root() -> dict[str, str]:
-    return {"message": "FastAPI backend is running"}
-
-
+# Serve Frontend Static Files
 FRONTEND_DIR = Path(__file__).resolve().parent.parent / "frontend" / "dist"
 
 if FRONTEND_DIR.is_dir():
     app.mount("/", StaticFiles(directory=FRONTEND_DIR, html=True), name="static")
+
