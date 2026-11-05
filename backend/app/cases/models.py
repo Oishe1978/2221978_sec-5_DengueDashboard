@@ -1,19 +1,14 @@
-from datetime import date, datetime, timezone
-from uuid import UUID, uuid4
-
-from sqlalchemy import UniqueConstraint
+from typing import Optional
 from sqlmodel import Field, SQLModel
 
-
 class DengueCase(SQLModel, table=True):
-    __tablename__ = "dengue_case"
-    __table_args__ = (UniqueConstraint("district", "report_date", name="uq_district_report_date"),)
-
-    id: UUID = Field(default_factory=uuid4, primary_key=True)
-    district: str = Field(index=True, max_length=60)
-    report_date: date = Field(index=True)
-    cases: int
-    deaths: int = 0
-    recovered: int = 0
-    severity: str = "low"
-    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    id: Optional[int] = Field(default=None, primary_key=True)
+    patient_name: str
+    age: int
+    district: str
+    hospital_name: str
+    severity: str
+    status: str
+    date: int
+    month: str
+    year: int
