@@ -58,15 +58,22 @@ export default function App() {
     }
 
     try {
+      const payload = {
+        patient_name: formData.patient_name,
+        age: Number(formData.age),
+        district: formData.district,
+        hospital_name: formData.hospital_name,
+        severity: formData.severity.replace(' Severity', ''), // 'Low Severity' -> 'Low'
+        status: formData.status,
+        date: new Date().getDate(),
+        month: "November",
+        year: 2026
+      };
+
       const res = await fetch('/api/cases', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...formData,
-          date: new Date().getDate(),
-          month: "November",
-          year: 2026
-        }),
+        body: JSON.stringify(payload),
       });
 
       if (res.ok) {
@@ -81,7 +88,8 @@ export default function App() {
         });
         fetchCases(selectedDistrict);
       } else {
-        alert("❌ Failed to add report. Check backend API.");
+        const errData = await res.json();
+        alert(`❌ Failed: ${errData.detail || "Check backend API"}`);
       }
     } catch (err) {
       alert("Error submitting form!");
@@ -122,7 +130,7 @@ export default function App() {
             <label style={{ fontSize: '13px', fontWeight: 'bold', color: '#555' }}>Patient Name</label>
             <input 
               type="text" 
-              placeholder="e.g. Rahim Ali" 
+              placeholder="e.g. Nusrat Jahan" 
               value={formData.patient_name} 
               onChange={(e) => setFormData({...formData, patient_name: e.target.value})} 
               required 
@@ -146,7 +154,7 @@ export default function App() {
             <label style={{ fontSize: '13px', fontWeight: 'bold', color: '#555' }}>District</label>
             <input 
               type="text" 
-              placeholder="District Name" 
+              placeholder="District Name (e.g. Rajshahi)" 
               value={formData.district} 
               onChange={(e) => setFormData({...formData, district: e.target.value})} 
               required 
@@ -158,7 +166,7 @@ export default function App() {
             <label style={{ fontSize: '13px', fontWeight: 'bold', color: '#555' }}>Hospital Name</label>
             <input 
               type="text" 
-              placeholder="Hospital Name" 
+              placeholder="Hospital Name (e.g. RMCH)" 
               value={formData.hospital_name} 
               onChange={(e) => setFormData({...formData, hospital_name: e.target.value})} 
               required 
@@ -173,9 +181,9 @@ export default function App() {
               onChange={(e) => setFormData({...formData, severity: e.target.value})}
               style={{ width: '100%', padding: '10px', marginTop: '5px', borderRadius: '6px', border: '1px solid #ccc', boxSizing: 'border-box' }}
             >
-              <option value="Low">Low Severity</option>
-              <option value="Medium">Medium Severity</option>
-              <option value="High">High Severity</option>
+              <option value="Low">Low</option>
+              <option value="Medium">Medium</option>
+              <option value="High">High</option>
             </select>
           </div>
 
@@ -257,3 +265,4 @@ export default function App() {
     </div>
   );
 }
+       
