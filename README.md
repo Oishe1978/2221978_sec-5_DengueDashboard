@@ -1,18 +1,20 @@
-Dengue Dashboard & Analytics System
+# Dengue Dashboard & Monitoring System
 
-A comprehensive web-based dashboard for tracking, reporting, and visualizing Dengue cases across different regions.
+A full-stack web application designed for real-time tracking, reporting, and surveillance of Dengue cases across various districts.
 
-🛠 Tech Stack
-- **Frontend:** React, TypeScript, Vite, TailwindCSS
-- **Backend:** Python, FastAPI, SQLModel
-- **Deployment:** Vercel (CI/CD)
+## 🚀 Tech Stack
+- **Frontend:** React, TypeScript, Vite
+- **Backend:** FastAPI, Python, SQLModel (SQLite)
+- **Deployment:** Vercel
 
-🔗 Live Application & API Endpoints
-- **Live Site:** [https://2221978-sec-05-danguedashboard.vercel.app](https://2221978-sec-05-danguedashboard.vercel.app)
-- **API Docs (Swagger UI):** [https://2221978-sec-05-danguedashboard.vercel.app/api/docs](https://2221978-sec-05-danguedashboard.vercel.app/api/docs)
+## 🔗 Live Application & API Docs
+- **Dashboard:** [Live Application](https://2221978-sec-5-dengue-dashboard.vercel.app)
+- **API Documentation:** [Swagger UI Docs](https://2221978-sec-5-dengue-dashboard.vercel.app/api/docs)
 
-📁 System Documentation
-All system specification files are organized inside the `docs/` folder:
-- `docs/PRD.md` - Product Requirements Document
-- `docs/SRS.md` - Software Requirements Specification
-- `docs/TDD.md` - Technical Design Document
+## 📌 Features
+- **Real-time Patient Reporting:** Add new dengue patient reports with district, hospital, severity, and status.
+- **District Filtering:** View reported dengue cases filtered by specific districts.
+- **Interactive API Documentation:** Full FastAPI Swagger UI available at `/api/docs`.
+
+---
+*Updated to trigger Vercel fresh deployment.*
