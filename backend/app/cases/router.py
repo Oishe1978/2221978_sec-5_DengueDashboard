@@ -1,83 +1,37 @@
-from datetime import date
-from typing import Annotated
-from uuid import UUID
-
-from fastapi import APIRouter, Depends, HTTPException, Response, status
-from sqlmodel import Session
-
-from app.cases.repository import CaseRepository
-from app.cases.schemas import CaseCreate, CaseRead, CaseUpdate, DengueStats, Severity
-from app.cases.service import (
-    CaseNotFoundError,
-    CaseService,
-    DuplicateReportError,
-    InvalidCaseError,
-)
+from typing import List, Optional
+from fastapi import APIRouter, Depends, Query
+from sqlmodel import Session, select
 from app.database import get_session
+from app.cases.models import DengueCase
 
-router = APIRouter(prefix="/api/v1", tags=["cases"])
+router = APIRouter(prefix="/cases", tags=["cases"])
 
-NOT_FOUND = HTTPException(status.HTTP_404_NOT_FOUND, "Case report not found")
-DUPLICATE = HTTPException(
-    status.HTTP_409_CONFLICT, "A report for this district and date already exists"
-)
+def seed_sample_data(session: Session):
+    existing = session.exec(select(DengueCase)).first()
+    if not existing:
+        sample_cases = [
+            DengueCase(patient_name="Rahim Ali", age=28, district="Dhaka", hospital_name="DMC", severity="High", status="Admitted", date=5, month="November", year=2026),
+            DengueCase(patient_name="Fatema Begum", age=35, district="Chittagong", hospital_name="CMC", severity="Medium", status="Recovered", date=4, month="November", year=2026),
+        ]
+        for case in sample_cases:
+            session.add(case)
+        session.commit()
 
+@router.get("", response_model=List[DengueCase])
+def get_cases(district: Optional[str] = Query(None), session: Session = Depends(get_session)):
+    seed_sample_data(session)
+    statement = select(DengueCase)
+    if district and district.lower() != "all":
+        statement = statement.where(DengueCase.district == district)
+    return session.exec(statement).all()
 
-def get_service(session: Annotated[Session, Depends(get_session)]) -> CaseService:
-    return CaseService(CaseRepository(session))
-
-
-Service = Annotated[CaseService, Depends(get_service)]
-
-
-@router.get("/cases", response_model=list[CaseRead])
-def list_cases(
-    service: Service,
-    district: str | None = None,
-    severity: Severity | None = None,
-    date_from: date | None = None,
-    date_to: date | None = None,
-):
-    return service.list_cases(district, severity, date_from, date_to)
-
-
-@router.get("/cases/{case_id}", response_model=CaseRead)
-def get_case(case_id: UUID, service: Service):
-    try:
-        return service.get_case(case_id)
-    except CaseNotFoundError:
-        raise NOT_FOUND
+@router.post("", response_model=DengueCase)
+def create_case(case: DengueCase, session: Session = Depends(get_session)):
+    session.add(case)
+    session.commit()
+    session.refresh(case)
+    return case
 
 
-@router.post("/cases", response_model=CaseRead, status_code=status.HTTP_201_CREATED)
-def create_case(payload: CaseCreate, service: Service):
-    try:
-        return service.create_case(payload)
-    except DuplicateReportError:
-        raise DUPLICATE
 
 
-@router.patch("/cases/{case_id}", response_model=CaseRead)
-def update_case(case_id: UUID, payload: CaseUpdate, service: Service):
-    try:
-        return service.update_case(case_id, payload)
-    except CaseNotFoundError:
-        raise NOT_FOUND
-    except DuplicateReportError:
-        raise DUPLICATE
-    except InvalidCaseError as e:
-        raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, str(e))
-
-
-@router.delete("/cases/{case_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_case(case_id: UUID, service: Service):
-    try:
-        service.delete_case(case_id)
-    except CaseNotFoundError:
-        raise NOT_FOUND
-    return Response(status_code=status.HTTP_204_NO_CONTENT)
-
-
-@router.get("/dengue-stats", response_model=DengueStats)
-def dengue_stats(service: Service):
-    return service.stats()
