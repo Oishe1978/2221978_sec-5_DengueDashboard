@@ -1,16 +1,20 @@
 from contextlib import asynccontextmanager
 from pathlib import Path
-
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
-from app.cases import models  # noqa: F401  (registers the table)
+from app.cases import models  # noqa: F401
 from app.cases.router import router as cases_router
 from app.database import create_db_and_tables
 
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
-    create_db_and_tables()
+    try:
+        create_db_and_tables()
+    except Exception as e:
+        print(f"Database setup error (ignored for server stability): {e}")
     yield
 
 
@@ -21,6 +25,15 @@ app = FastAPI(
     redoc_url=None,
     lifespan=lifespan,
 )
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 app.include_router(cases_router)
 
 
@@ -29,13 +42,12 @@ def health() -> dict[str, str]:
     return {"status": "ok"}
 
 
-@app.get("/")
+@app.get("/api/hello")
 def root() -> dict[str, str]:
     return {"message": "FastAPI backend is running"}
 
 
 FRONTEND_DIR = Path(__file__).resolve().parent.parent / "frontend" / "dist"
 
-# dist/ only exists after `npm run build`; in dev the Vite server serves the UI.
 if FRONTEND_DIR.is_dir():
-    app.frontend("/", directory=FRONTEND_DIR)
+    app.mount("/", StaticFiles(directory=FRONTEND_DIR, html=True), name="static")
