@@ -11,7 +11,7 @@ from app.database import create_db_and_tables
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
-   
+    # Database initialization safely handled so server never crashes on Vercel
     try:
         create_db_and_tables()
     except Exception as e:
@@ -27,7 +27,7 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# CORS configuration 
+# CORS setup for Frontend communication
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -36,7 +36,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# API Routers
+# Router binding
 app.include_router(cases_router, prefix="/api")
 
 
@@ -45,9 +45,8 @@ def health() -> dict[str, str]:
     return {"status": "ok"}
 
 
-# Serve Frontend Static Files
-FRONTEND_DIR = Path(__file__).resolve().parent.parent / "frontend" / "dist"
+# Mount Frontenddist static files if existing
+FRONTEND_DIR = Path(__file__).resolve().parent.parent.parent / "frontend" / "dist"
 
 if FRONTEND_DIR.is_dir():
     app.mount("/", StaticFiles(directory=FRONTEND_DIR, html=True), name="static")
-
