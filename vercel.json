@@ -1,5 +1,5 @@
 {
-  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "version": 2,
   "builds": [
     {
       "src": "backend/app/main.py",
@@ -14,14 +14,6 @@
     }
   ],
   "routes": [
-    {
-      "src": "/api/docs",
-      "dest": "backend/app/main.py"
-    },
-    {
-      "src": "/api/openapi.json",
-      "dest": "backend/app/main.py"
-    },
     {
       "src": "/api/(.*)",
       "dest": "backend/app/main.py"
