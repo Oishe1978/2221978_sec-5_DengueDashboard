@@ -9,6 +9,6 @@ class DengueCase(SQLModel, table=True):
     hospital_name: str
     severity: str
     status: str
-    date: int
-    month: str
-    year: int
+    date: Optional[int] = Field(default=5)
+    month: Optional[str] = Field(default="November")
+    year: Optional[int] = Field(default=2026)
