@@ -1,13 +1,27 @@
+
+import sys
+from pathlib import Path
 from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
+# Add the backend folder to Python's import path
+BACKEND_DIR = str(Path(__file__).resolve().parent)
+
+if BACKEND_DIR not in sys.path:
+    sys.path.insert(0, BACKEND_DIR)
+
+# Import backend modules
 from app.cases.router import router as cases_router
 from app.database import create_db_and_tables
+
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     create_db_and_tables()
     yield
+
 
 app = FastAPI(
     title="Dengue Dashboard API",
@@ -15,6 +29,7 @@ app = FastAPI(
     openapi_url="/api/openapi.json",
     lifespan=lifespan,
 )
+
 
 app.add_middleware(
     CORSMiddleware,
@@ -24,7 +39,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 app.include_router(cases_router, prefix="/api")
+
 
 @app.get("/api/health")
 def health():
