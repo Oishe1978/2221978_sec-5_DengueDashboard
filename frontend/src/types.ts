@@ -1,23 +1,23 @@
-export type Severity = "low" | "medium" | "high";
+
+export type Severity = "Low" | "Medium" | "High";
 
 export interface DengueCase {
-  id: string;
+  id: number;
+  patient_name: string;
+  age: number;
   district: string;
-  report_date: string;
-  cases: number;
-  deaths: number;
-  recovered: number;
+  hospital_name: string;
   severity: Severity;
-  created_at: string;
+  status: string;
+  date?: number | null;
+  month?: string | null;
+  year?: number | null;
 }
 
-export type CaseInput = Omit<DengueCase, "id" | "created_at">;
+export type CaseInput = Omit<DengueCase, "id">;
 
 export interface CaseFilters {
   district?: string;
-  severity?: Severity | "";
-  date_from?: string;
-  date_to?: string;
 }
 
 export interface DengueStats {
