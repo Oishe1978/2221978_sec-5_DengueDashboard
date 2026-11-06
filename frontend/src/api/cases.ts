@@ -1,6 +1,6 @@
 import type { CaseFilters, CaseInput, DengueCase, DengueStats } from "../types";
 
-const BASE = "/api/v1";
+const BASE = "/api";
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${BASE}${path}`, {
