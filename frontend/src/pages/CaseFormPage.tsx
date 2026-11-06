@@ -1,28 +1,32 @@
+
 import { useEffect, useState, type FormEvent } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { createCase, getCase, updateCase } from "../api/cases";
-import { DISTRICTS } from "../constants";
 import type { CaseInput, Severity } from "../types";
 
 interface FormState {
+  patient_name: string;
+  age: string;
   district: string;
-  report_date: string;
-  cases: string;
-  deaths: string;
-  recovered: string;
+  hospital_name: string;
   severity: Severity;
+  status: string;
 }
 
 const EMPTY: FormState = {
-  district: "", report_date: "", cases: "", deaths: "0", recovered: "0", severity: "low",
+  patient_name: "",
+  age: "",
+  district: "",
+  hospital_name: "",
+  severity: "Low",
+  status: "Admitted",
 };
-
-const isCount = (v: string) => /^\d+$/.test(v);
 
 export default function CaseFormPage() {
   const { id } = useParams();
   const isEdit = Boolean(id);
   const navigate = useNavigate();
+
   const [form, setForm] = useState<FormState>(EMPTY);
   const [errors, setErrors] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
@@ -30,101 +34,194 @@ export default function CaseFormPage() {
 
   useEffect(() => {
     if (!id) return;
+
     getCase(id)
       .then((c) =>
         setForm({
+          patient_name: c.patient_name,
+          age: String(c.age),
           district: c.district,
-          report_date: c.report_date,
-          cases: String(c.cases),
-          deaths: String(c.deaths),
-          recovered: String(c.recovered),
+          hospital_name: c.hospital_name,
           severity: c.severity,
-        }),
+          status: c.status,
+        })
       )
-      .catch((e: unknown) => setErrors([e instanceof Error ? e.message : "Failed to load report"]))
+      .catch((e: unknown) =>
+        setErrors([
+          e instanceof Error ? e.message : "Failed to load patient",
+        ])
+      )
       .finally(() => setLoading(false));
   }, [id]);
 
-  const set = (patch: Partial<FormState>) => setForm((f) => ({ ...f, ...patch }));
+  const set = (patch: Partial<FormState>) =>
+    setForm((f) => ({ ...f, ...patch }));
 
   function validate(): string[] {
     const problems: string[] = [];
-    if (!form.district) problems.push("Select a district.");
-    if (!form.report_date) problems.push("Choose a report date.");
-    if (![form.cases, form.deaths, form.recovered].every(isCount))
-      problems.push("Cases, deaths and recovered must be whole numbers (0 or more).");
-    else if (Number(form.deaths) + Number(form.recovered) > Number(form.cases))
-      problems.push("Deaths + recovered cannot exceed total cases.");
+
+    if (!form.patient_name.trim()) {
+      problems.push("Enter the patient name.");
+    }
+
+    if (!/^\d+$/.test(form.age) || Number(form.age) < 1) {
+      problems.push("Enter a valid patient age.");
+    }
+
+    if (!form.district.trim()) {
+      problems.push("Enter the district.");
+    }
+
+    if (!form.hospital_name.trim()) {
+      problems.push("Enter the hospital name.");
+    }
+
+    if (!form.status.trim()) {
+      problems.push("Select the patient status.");
+    }
+
     return problems;
   }
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
+
     const problems = validate();
     setErrors(problems);
-    if (problems.length) return;
+
+    if (problems.length > 0) return;
 
     const payload: CaseInput = {
-      district: form.district,
-      report_date: form.report_date,
-      cases: Number(form.cases),
-      deaths: Number(form.deaths),
-      recovered: Number(form.recovered),
+      patient_name: form.patient_name.trim(),
+      age: Number(form.age),
+      district: form.district.trim(),
+      hospital_name: form.hospital_name.trim(),
       severity: form.severity,
+      status: form.status,
     };
+
     setSaving(true);
+
     try {
-      if (id) await updateCase(id, payload);
-      else await createCase(payload);
+      if (id) {
+        await updateCase(id, payload);
+      } else {
+        await createCase(payload);
+      }
+
       navigate("/cases");
     } catch (err) {
-      setErrors([err instanceof Error ? err.message : "Save failed"]);
+      setErrors([
+        err instanceof Error ? err.message : "Save failed",
+      ]);
     } finally {
       setSaving(false);
     }
   }
 
-  if (loading) return <p className="muted">Loading…</p>;
+  if (loading) {
+    return <p className="muted">Loading...</p>;
+  }
 
   return (
     <section>
-      <h1>{isEdit ? "Edit report" : "New report"}</h1>
-      <form className="form card" onSubmit={(e) => void handleSubmit(e)} noValidate>
+      <h1>{isEdit ? "Edit Patient Report" : "Add New Patient"}</h1>
+
+      <form
+        className="form card"
+        onSubmit={(e) => void handleSubmit(e)}
+        noValidate
+      >
         {errors.length > 0 && (
-          <ul className="alert">{errors.map((m) => <li key={m}>{m}</li>)}</ul>
+          <ul className="alert">
+            {errors.map((m) => (
+              <li key={m}>{m}</li>
+            ))}
+          </ul>
         )}
-        <label>District
-          <select value={form.district} onChange={(e) => set({ district: e.target.value })}>
-            <option value="">Select…</option>
-            {DISTRICTS.map((d) => <option key={d} value={d}>{d}</option>)}
+
+        <label>
+          Patient Name
+          <input
+            type="text"
+            value={form.patient_name}
+            onChange={(e) => set({ patient_name: e.target.value })}
+            placeholder="Enter patient name"
+          />
+        </label>
+
+        <label>
+          Age
+          <input
+            type="number"
+            min="1"
+            value={form.age}
+            onChange={(e) => set({ age: e.target.value })}
+            placeholder="Enter age"
+          />
+        </label>
+
+        <label>
+          District
+          <input
+            type="text"
+            value={form.district}
+            onChange={(e) => set({ district: e.target.value })}
+            placeholder="Enter district"
+          />
+        </label>
+
+        <label>
+          Hospital Name
+          <input
+            type="text"
+            value={form.hospital_name}
+            onChange={(e) => set({ hospital_name: e.target.value })}
+            placeholder="Enter hospital name"
+          />
+        </label>
+
+        <label>
+          Severity
+          <select
+            value={form.severity}
+            onChange={(e) =>
+              set({ severity: e.target.value as Severity })
+            }
+          >
+            <option value="Low">Low</option>
+            <option value="Medium">Medium</option>
+            <option value="High">High</option>
           </select>
         </label>
-        <label>Report date
-          <input type="date" value={form.report_date} onChange={(e) => set({ report_date: e.target.value })} />
-        </label>
-        <div className="grid-3">
-          <label>Cases
-            <input inputMode="numeric" value={form.cases} onChange={(e) => set({ cases: e.target.value })} />
-          </label>
-          <label>Deaths
-            <input inputMode="numeric" value={form.deaths} onChange={(e) => set({ deaths: e.target.value })} />
-          </label>
-          <label>Recovered
-            <input inputMode="numeric" value={form.recovered} onChange={(e) => set({ recovered: e.target.value })} />
-          </label>
-        </div>
-        <label>Severity
-          <select value={form.severity} onChange={(e) => set({ severity: e.target.value as Severity })}>
-            <option value="low">Low</option>
-            <option value="medium">Medium</option>
-            <option value="high">High</option>
+
+        <label>
+          Patient Status
+          <select
+            value={form.status}
+            onChange={(e) => set({ status: e.target.value })}
+          >
+            <option value="Admitted">Admitted</option>
+            <option value="Recovered">Recovered</option>
+            <option value="Discharged">Discharged</option>
           </select>
         </label>
+
         <div className="actions">
-          <button className="btn btn-primary" disabled={saving}>{saving ? "Saving…" : "Save"}</button>
-          <Link className="btn" to="/cases">Cancel</Link>
+          <button
+            className="btn btn-primary"
+            disabled={saving}
+            type="submit"
+          >
+            {saving ? "Saving..." : "Save"}
+          </button>
+
+          <Link className="btn" to="/cases">
+            Cancel
+          </Link>
         </div>
       </form>
     </section>
   );
 }
+
