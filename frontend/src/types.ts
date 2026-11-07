@@ -1,28 +1,30 @@
+import type { Division } from "./constants";
 
-export type Severity = "Low" | "Medium" | "High";
+export type Source = "dghs" | "synthetic" | "manual";
 
-export interface DengueCase {
-  id: number;
-  patient_name: string;
-  age: number;
-  district: string;
-  hospital_name: string;
-  severity: Severity;
-  status: string;
-  date?: number | null;
-  month?: string | null;
-  year?: number | null;
-}
-
-export type CaseInput = Omit<DengueCase, "id">;
-
-export interface CaseFilters {
-  district?: string;
-}
-
-export interface DengueStats {
-  total_cases: number;
-  active_cases: number;
-  recovered: number;
+export interface DailyReport {
+  id: string;
+  division: Division;
+  report_date: string; // YYYY-MM-DD
+  admitted: number;
   deaths: number;
+  source: Source;
+  created_at: string;
+  updated_at: string;
+}
+
+export type ReportInput = Pick<DailyReport, "division" | "report_date" | "admitted" | "deaths">;
+
+export interface ReportFilters {
+  division?: Division | "";
+  date_from?: string;
+  date_to?: string;
+  source?: Source | "";
+}
+
+export interface ReportPage {
+  items: DailyReport[];
+  total: number;
+  offset: number;
+  limit: number;
 }
