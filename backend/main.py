@@ -9,7 +9,7 @@ sys.path.insert(0, str(BACKEND_DIR))
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.cases.router import router as cases_router
+from app.reports.router import router as reports_router
 from app.database import create_db_and_tables
 
 
@@ -36,7 +36,7 @@ app.add_middleware(
 )
 
 
-app.include_router(cases_router, prefix="/api")
+app.include_router(reports_router)
 
 
 @app.get("/api/health")
