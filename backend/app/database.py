@@ -1,27 +1,27 @@
+from collections.abc import Iterator
 
-from sqlmodel import SQLModel, create_engine, Session
+from sqlalchemy.pool import NullPool
+from sqlmodel import Session, SQLModel, create_engine
+
 from app.config import DATABASE_URL
 
 
-# Configure database connection
-if DATABASE_URL.startswith("sqlite"):
-    engine = create_engine(
-        DATABASE_URL,
-        connect_args={"check_same_thread": False}
-    )
-else:
-    engine = create_engine(
-        DATABASE_URL,
-        pool_pre_ping=True
-    )
+def _make_engine():
+    if DATABASE_URL.startswith("sqlite"):
+        return create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
+    # Supabase transaction pooler: no client-side pooling and no prepared statements.
+    return create_engine(DATABASE_URL, poolclass=NullPool, connect_args={"prepare_threshold": None})
 
 
-# Create database tables
-def create_db_and_tables():
+engine = _make_engine()
+
+
+def create_db_and_tables() -> None:
+    from app.reports import models  # noqa: F401  (registers the tables)
+
     SQLModel.metadata.create_all(engine)
 
 
-# Provide database session
-def get_session():
+def get_session() -> Iterator[Session]:
     with Session(engine) as session:
         yield session
