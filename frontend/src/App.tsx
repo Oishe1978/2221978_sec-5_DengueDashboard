@@ -1,6 +1,8 @@
 import { HashRouter, NavLink, Navigate, Route, Routes } from "react-router-dom";
 import { AuthProvider, useAuth } from "./auth/AuthContext";
 import RequireAdmin from "./components/RequireAdmin";
+import DashboardPage from "./pages/DashboardPage";
+import DayPage from "./pages/DayPage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import ReportDetailPage from "./pages/ReportDetailPage";
@@ -14,6 +16,7 @@ function Header() {
     <header className="topbar">
       <span className="brand">🦟 Dengue Dashboard</span>
       <nav>
+        <NavLink to="/" end>Dashboard</NavLink>
         {isAdmin && <NavLink to="/reports" end>Manage data</NavLink>}
         {isAdmin && <NavLink to="/reports/new">Add report</NavLink>}
         {user ? (
@@ -39,7 +42,8 @@ export default function App() {
         <Header />
         <main className="container">
           <Routes>
-            <Route path="/" element={<Navigate to="/reports" replace />} />
+            <Route path="/" element={<DashboardPage />} />
+            <Route path="/day/:date" element={<DayPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/reports" element={<RequireAdmin><ReportsPage /></RequireAdmin>} />
