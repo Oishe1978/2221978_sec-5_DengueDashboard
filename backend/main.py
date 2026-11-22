@@ -7,6 +7,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from fastapi import FastAPI
 
+from app.auth.router import router as auth_router
 from app.database import create_db_and_tables
 from app.reports.router import router as reports_router
 from app.stats.router import router as stats_router
@@ -29,6 +30,7 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+app.include_router(auth_router)
 app.include_router(reports_router)
 app.include_router(stats_router)
 
