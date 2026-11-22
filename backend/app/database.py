@@ -17,7 +17,8 @@ engine = _make_engine()
 
 
 def create_db_and_tables() -> None:
-    from app.reports import models  # noqa: F401  (registers the tables)
+    from app.auth import models as auth_models  # noqa: F401  (registers the users table)
+    from app.reports import models  # noqa: F401  (registers the reports table)
 
     SQLModel.metadata.create_all(engine)
 

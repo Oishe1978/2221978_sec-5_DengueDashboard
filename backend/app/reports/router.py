@@ -5,6 +5,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 from sqlmodel import Session
 
+from app.auth.deps import require_admin
 from app.database import get_session
 from app.reports.repository import ReportRepository
 from app.reports.schemas import (
@@ -36,6 +37,9 @@ def get_service(session: Annotated[Session, Depends(get_session)]) -> ReportServ
 
 
 Service = Annotated[ReportService, Depends(get_service)]
+
+# Reading is public; creating, editing and deleting need an admin account.
+AdminOnly = [Depends(require_admin)]
 
 
 @router.get("/divisions", response_model=list[str])
@@ -72,7 +76,7 @@ def get_report(report_id: UUID, service: Service):
         raise NOT_FOUND
 
 
-@router.post("", response_model=ReportRead, status_code=status.HTTP_201_CREATED)
+@router.post("", response_model=ReportRead, status_code=status.HTTP_201_CREATED, dependencies=AdminOnly)
 def create_report(payload: ReportCreate, service: Service):
     try:
         return service.create_report(payload)
@@ -82,7 +86,7 @@ def create_report(payload: ReportCreate, service: Service):
         raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, str(e))
 
 
-@router.patch("/{report_id}", response_model=ReportRead)
+@router.patch("/{report_id}", response_model=ReportRead, dependencies=AdminOnly)
 def update_report(report_id: UUID, payload: ReportUpdate, service: Service):
     try:
         return service.update_report(report_id, payload)
@@ -94,7 +98,7 @@ def update_report(report_id: UUID, payload: ReportUpdate, service: Service):
         raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, str(e))
 
 
-@router.delete("/{report_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{report_id}", status_code=status.HTTP_204_NO_CONTENT, dependencies=AdminOnly)
 def delete_report(report_id: UUID, service: Service):
     try:
         service.delete_report(report_id)
