@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Literal, Optional
 from uuid import UUID
 
@@ -21,6 +22,16 @@ class LoginRequest(BaseModel):
     password: str = Field(min_length=1, max_length=128)
 
 
+class UpdateProfileRequest(BaseModel):
+    name: Optional[str] = Field(default=None, min_length=2, max_length=100)
+    email: Optional[str] = Field(default=None, pattern=EMAIL_PATTERN, max_length=254)
+
+
+class ChangePasswordRequest(BaseModel):
+    current_password: str = Field(min_length=1, max_length=128)
+    new_password: str = Field(min_length=8, max_length=128)
+
+
 class UserRead(BaseModel):
     id: UUID
     name: str
@@ -32,3 +43,13 @@ class TokenResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
     user: UserRead
+
+
+class SessionRead(BaseModel):
+    id: UUID
+    user_agent: str
+    ip_address: str
+    created_at: datetime
+    last_used_at: datetime
+    expires_at: datetime
+    current: bool
