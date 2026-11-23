@@ -6,8 +6,19 @@ load_dotenv()
 
 IS_VERCEL = bool(os.getenv("VERCEL"))
 
-JWT_SECRET = os.getenv("JWT_SECRET")
+# --- secrets (environment variables only, never in the repository) ---
+JWT_SECRET = os.getenv("JWT_SECRET")              # signs the access tokens
+PASSWORD_PEPPER = os.getenv("PASSWORD_PEPPER")    # secret mixed into every password before hashing
 ADMIN_SIGNUP_CODE = os.getenv("ADMIN_SIGNUP_CODE")
+
+# --- session settings ---
+ACCESS_MINUTES = int(os.getenv("JWT_ACCESS_MINUTES", "15"))   # short-lived access token
+REFRESH_DAYS = int(os.getenv("JWT_REFRESH_DAYS", "7"))        # refresh cookie lifetime
+COOKIE_SECURE = IS_VERCEL or os.getenv("COOKIE_SECURE", "").lower() == "true"
+
+# --- brute-force protection ---
+MAX_FAILED_LOGINS = int(os.getenv("MAX_FAILED_LOGINS", "5"))
+LOCK_MINUTES = int(os.getenv("LOCK_MINUTES", "15"))
 
 
 def get_database_url() -> str:
