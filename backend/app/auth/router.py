@@ -31,6 +31,7 @@ from app.auth.service import (
 from app.auth.sessions import InvalidRefreshError, SessionService
 from app.auth.tokens import create_access_token
 from app.config import COOKIE_SECURE, REFRESH_DAYS
+from app.rbac.permissions import permissions_for
 from app.database import get_session
 
 router = APIRouter(prefix="/api/v1/auth", tags=["auth"])
@@ -63,9 +64,19 @@ def _clear_refresh_cookie(response: Response) -> None:
     response.delete_cookie(key=REFRESH_COOKIE, path=COOKIE_PATH)
 
 
+def _user_payload(user: User) -> dict:
+    return {
+        "id": user.id,
+        "name": user.name,
+        "email": user.email,
+        "role": user.role,
+        "permissions": sorted(permissions_for(user.role)),
+    }
+
+
 def _token_response(user: User, session: UserSession) -> dict:
     token = create_access_token(str(user.id), user.role, str(session.id))
-    return {"access_token": token, "token_type": "bearer", "user": user}
+    return {"access_token": token, "token_type": "bearer", "user": _user_payload(user)}
 
 
 @router.post("/register", response_model=TokenResponse, status_code=status.HTTP_201_CREATED)
@@ -125,13 +136,14 @@ def logout(request: Request, service: Service):
 
 @router.get("/me", response_model=UserRead)
 def me(auth: Auth):
-    return auth.user
+    return _user_payload(auth.user)
 
 
 @router.patch("/me", response_model=UserRead)
 def update_me(payload: UpdateProfileRequest, request: Request, auth: Auth, service: Service):
     try:
-        return service.update_profile(auth.user, payload.name, payload.email, client_ip(request), user_agent(request))
+        user = service.update_profile(auth.user, payload.name, payload.email, client_ip(request), user_agent(request))
+        return _user_payload(user)
     except EmailTakenError:
         raise HTTPException(status.HTTP_409_CONFLICT, "An account with this email already exists")
 

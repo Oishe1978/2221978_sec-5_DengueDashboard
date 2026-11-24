@@ -7,10 +7,12 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from fastapi import FastAPI
 
+from app.admin.router import router as admin_router
 from app.auth.router import router as auth_router
 from app.database import create_db_and_tables
 from app.reports.router import router as reports_router
 from app.stats.router import router as stats_router
+from app.watchlist.router import router as watchlist_router
 
 
 @asynccontextmanager
@@ -33,6 +35,8 @@ app = FastAPI(
 app.include_router(auth_router)
 app.include_router(reports_router)
 app.include_router(stats_router)
+app.include_router(watchlist_router)
+app.include_router(admin_router)
 
 
 @app.get("/api/health")

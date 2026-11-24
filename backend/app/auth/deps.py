@@ -52,9 +52,3 @@ def get_current_auth(
 
 def get_current_user(auth: Annotated[CurrentAuth, Depends(get_current_auth)]) -> User:
     return auth.user
-
-
-def require_admin(user: Annotated[User, Depends(get_current_user)]) -> User:
-    if user.role != "admin":
-        raise HTTPException(status.HTTP_403_FORBIDDEN, "Admin access required")
-    return user
