@@ -37,6 +37,7 @@ class UserRead(BaseModel):
     name: str
     email: str
     role: str
+    permissions: list[str]   # what this role may do; the frontend uses it for menus and route guards
 
 
 class TokenResponse(BaseModel):

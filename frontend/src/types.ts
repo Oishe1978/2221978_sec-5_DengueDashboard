@@ -111,6 +111,7 @@ export interface AuthUser {
   name: string;
   email: string;
   role: Role;
+  permissions: string[]; // what the server allows this role to do; used for menus and route guards
 }
 
 export interface TokenResponse {
@@ -130,4 +131,51 @@ export interface RegisterInput {
   password: string;
   role: Role;
   admin_code?: string;
+}
+
+/* ---------- profile and sessions ---------- */
+
+export interface UpdateProfileInput {
+  name?: string;
+  email?: string;
+}
+
+export interface ChangePasswordInput {
+  current_password: string;
+  new_password: string;
+}
+
+export interface SessionInfo {
+  id: string;
+  user_agent: string;
+  ip_address: string;
+  created_at: string;
+  last_used_at: string;
+  expires_at: string;
+  current: boolean;
+}
+
+/* ---------- watchlist (/api/v1/watchlist) ---------- */
+
+export interface WatchItem {
+  id: string;
+  division: Division;
+  threshold: number;
+  note: string | null;
+  created_at: string;
+  updated_at: string;
+  latest_date: string | null;
+  latest_admitted: number | null;
+  alert: boolean;
+}
+
+export interface WatchCreateInput {
+  division: Division;
+  threshold: number;
+  note?: string;
+}
+
+export interface WatchUpdateInput {
+  threshold?: number;
+  note?: string;
 }

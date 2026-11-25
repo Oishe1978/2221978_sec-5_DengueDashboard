@@ -48,8 +48,19 @@ export function formatDateLong(iso: string): string {
   });
 }
 
+/** The server sends UTC times; some arrive without a "Z", so add it before converting to local time. */
 export function formatDateTime(iso: string): string {
-  return new Date(iso).toLocaleString("en-GB");
+  const hasZone = /([zZ]|[+-]\d{2}:\d{2})$/.test(iso);
+  return new Date(hasZone ? iso : `${iso}Z`).toLocaleString("en-GB");
+}
+
+/** "Mozilla/5.0 (Windows NT 10.0; ...) Chrome/120 ..." -> "Chrome on Windows" */
+export function describeUserAgent(ua: string): string {
+  const browser = /Edg\//.test(ua) ? "Edge" : /OPR\//.test(ua) ? "Opera" : /Chrome\//.test(ua) ? "Chrome"
+    : /Firefox\//.test(ua) ? "Firefox" : /Safari\//.test(ua) ? "Safari" : "Browser";
+  const os = /Windows/.test(ua) ? "Windows" : /Android/.test(ua) ? "Android" : /iPhone|iPad/.test(ua) ? "iOS"
+    : /Mac OS X/.test(ua) ? "macOS" : /Linux/.test(ua) ? "Linux" : "";
+  return os ? `${browser} on ${os}` : browser;
 }
 
 export function formatNumber(n: number): string {

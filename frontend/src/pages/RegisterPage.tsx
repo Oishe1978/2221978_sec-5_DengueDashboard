@@ -21,7 +21,9 @@ export default function RegisterPage() {
     const problems: string[] = [];
     if (name.trim().length < 2) problems.push("Enter your name (at least 2 characters).");
     if (!EMAIL_PATTERN.test(email.trim())) problems.push("Enter a valid email address.");
-    if (password.length < 8) problems.push("The password must be at least 8 characters.");
+    if (password.length < 8 || !/[A-Za-z]/.test(password) || !/\d/.test(password)) {
+      problems.push("The password needs 8 or more characters, a letter and a digit.");
+    }
     if (password !== confirm) problems.push("The two passwords do not match.");
     if (role === "admin" && !adminCode.trim()) problems.push("Enter the admin code to register as an admin.");
     return problems;
@@ -69,7 +71,7 @@ export default function RegisterPage() {
           <input type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} />
         </label>
         <label>
-          Password (8 or more characters)
+          Password (8+ characters, a letter and a digit)
           <input
             type="password"
             autoComplete="new-password"

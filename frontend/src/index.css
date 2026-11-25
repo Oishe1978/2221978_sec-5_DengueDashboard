@@ -116,3 +116,21 @@ td.actions { justify-content: flex-end; }
 .auth-wrap { display: flex; justify-content: center; padding-top: 1rem; }
 .auth-card { width: 100%; max-width: 440px; display: grid; gap: 1rem; }
 .auth-card h1 { margin-bottom: .25rem; }
+
+/* ---------- profile page ---------- */
+.profile-grid { display: grid; gap: 1.1rem; }
+@media (min-width: 960px) { .profile-grid { grid-template-columns: 1fr 1fr; } }
+.profile-grid .wide { grid-column: 1 / -1; }
+.badge-current { display: inline-block; background: #dcfce7; color: #166534; border-radius: 999px; padding: .1rem .55rem; font-size: .75rem; font-weight: 600; }
+.success { background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; border-radius: 10px; padding: .6rem .9rem; margin: .5rem 0; }
+
+/* ---------- watchlist ---------- */
+.watch-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem; }
+.watch-card { display: grid; gap: .5rem; border-left: 4px solid var(--green); }
+.watch-card.watch-alert { border-left-color: var(--red); }
+.watch-card header { display: flex; align-items: center; justify-content: space-between; gap: .5rem; }
+.watch-number { font-size: 2rem; font-weight: 700; margin: 0; font-variant-numeric: tabular-nums; }
+.watch-number span { font-size: 1rem; font-weight: 400; color: var(--muted); }
+.watch-note { margin: 0; padding: .5rem .7rem; background: #f8fafc; border-radius: 8px; font-size: .9rem; }
+.badge-alert { background: var(--red); }
+.badge-ok { background: var(--green); }

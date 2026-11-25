@@ -2,11 +2,16 @@ from datetime import date
 from typing import Annotated, Optional
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response, status
 from sqlmodel import Session
 
-from app.auth.deps import require_admin
+from app.audit import events
+from app.audit.service import record
+from app.auth.models import User
+from app.auth.request_info import client_ip, user_agent
 from app.database import get_session
+from app.rbac.deps import require_permission
+from app.rbac.permissions import Permission
 from app.reports.repository import ReportRepository
 from app.reports.schemas import (
     DIVISIONS,
@@ -38,8 +43,8 @@ def get_service(session: Annotated[Session, Depends(get_session)]) -> ReportServ
 
 Service = Annotated[ReportService, Depends(get_service)]
 
-# Reading is public; creating, editing and deleting need an admin account.
-AdminOnly = [Depends(require_admin)]
+# Reading is public; creating, editing and deleting need the reports:write permission (admins).
+WriteAccess = Annotated[User, Depends(require_permission(Permission.REPORTS_WRITE))]
 
 
 @router.get("/divisions", response_model=list[str])
@@ -76,8 +81,8 @@ def get_report(report_id: UUID, service: Service):
         raise NOT_FOUND
 
 
-@router.post("", response_model=ReportRead, status_code=status.HTTP_201_CREATED, dependencies=AdminOnly)
-def create_report(payload: ReportCreate, service: Service):
+@router.post("", response_model=ReportRead, status_code=status.HTTP_201_CREATED)
+def create_report(payload: ReportCreate, _user: WriteAccess, service: Service):
     try:
         return service.create_report(payload)
     except DuplicateReportError:
@@ -86,8 +91,8 @@ def create_report(payload: ReportCreate, service: Service):
         raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, str(e))
 
 
-@router.patch("/{report_id}", response_model=ReportRead, dependencies=AdminOnly)
-def update_report(report_id: UUID, payload: ReportUpdate, service: Service):
+@router.patch("/{report_id}", response_model=ReportRead)
+def update_report(report_id: UUID, payload: ReportUpdate, _user: WriteAccess, service: Service):
     try:
         return service.update_report(report_id, payload)
     except ReportNotFoundError:
@@ -98,10 +103,18 @@ def update_report(report_id: UUID, payload: ReportUpdate, service: Service):
         raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, str(e))
 
 
-@router.delete("/{report_id}", status_code=status.HTTP_204_NO_CONTENT, dependencies=AdminOnly)
-def delete_report(report_id: UUID, service: Service):
+@router.delete("/{report_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_report(
+    report_id: UUID,
+    request: Request,
+    user: WriteAccess,
+    service: Service,
+    db: Annotated[Session, Depends(get_session)],
+):
     try:
         service.delete_report(report_id)
     except ReportNotFoundError:
         raise NOT_FOUND
+    record(db, events.RECORD_DELETE, user_id=user.id, email=user.email, ip=client_ip(request),
+           agent=user_agent(request), details=f"daily report {report_id}")
     return Response(status_code=status.HTTP_204_NO_CONTENT)

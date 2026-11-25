@@ -9,6 +9,7 @@ import KpiCard from "../components/KpiCard";
 import TrendChart from "../components/TrendChart";
 import WeekdayChart from "../components/WeekdayChart";
 import { useAuth } from "../auth/AuthContext";
+import { PERMISSIONS, can } from "../auth/permissions";
 import { DIVISIONS, type Division } from "../constants";
 import { useAsync } from "../hooks/useAsync";
 import type { DayReport, WeekdayStat } from "../types";
@@ -76,7 +77,7 @@ export default function DayPage() {
   const [params] = useSearchParams();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const isAdmin = user?.role === "admin";
+  const canEdit = can(user, PERMISSIONS.REPORTS_WRITE);
 
   const rawDivision = params.get("division") ?? "";
   const division: Division | "" = (DIVISIONS as readonly string[]).includes(rawDivision)
@@ -220,7 +221,7 @@ export default function DayPage() {
                         <td className="num">{formatNumber(r.admitted)}</td>
                         <td className="num">{formatNumber(r.deaths)}</td>
                         <td className="actions">
-                          {isAdmin && <Link className="btn btn-sm" to={`/reports/${r.id}/edit`}>Edit</Link>}
+                          {canEdit && <Link className="btn btn-sm" to={`/reports/${r.id}/edit`}>Edit</Link>}
                         </td>
                       </tr>
                     ))}

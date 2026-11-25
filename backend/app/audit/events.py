@@ -12,3 +12,7 @@ REFRESH_REUSE = "refresh_reuse"          # an already-used refresh token was pre
 PASSWORD_CHANGE = "password_change"
 PASSWORD_CHANGE_FAILED = "password_change_failed"
 PROFILE_UPDATE = "profile_update"
+ROLE_CHANGE = "role_change"
+USER_BAN = "user_ban"
+USER_UNBAN = "user_unban"
+RECORD_DELETE = "record_delete"          # a report or a watchlist item was deleted

@@ -1,26 +1,18 @@
-const KEY = "dengue_access_token";
+/**
+ * The short-lived access token is kept in memory only (not in localStorage or sessionStorage),
+ * so a script injected into the page cannot read it from storage. A page reload starts without a token
+ * and the app asks the server for a new one using the httpOnly refresh cookie.
+ */
+let accessToken: string | null = null;
 
-/** The token lives in sessionStorage: it survives a page refresh but not closing the tab. */
 export function getToken(): string | null {
-  try {
-    return sessionStorage.getItem(KEY);
-  } catch {
-    return null;
-  }
+  return accessToken;
 }
 
 export function setToken(token: string): void {
-  try {
-    sessionStorage.setItem(KEY, token);
-  } catch {
-    /* storage unavailable: the login only lasts until the page is reloaded */
-  }
+  accessToken = token;
 }
 
 export function clearToken(): void {
-  try {
-    sessionStorage.removeItem(KEY);
-  } catch {
-    /* nothing to clear */
-  }
+  accessToken = null;
 }
