@@ -21,6 +21,7 @@ def create_db_and_tables() -> None:
     from app.auth import models as auth_models  # noqa: F401  (registers users and sessions)
     from app.reports import models  # noqa: F401  (registers the reports table)
     from app.watchlist import models as watch_models  # noqa: F401  (registers the watchlist table)
+    from app.teams import models as team_models  # noqa: F401  (registers the team tables)
 
     SQLModel.metadata.create_all(engine)
 

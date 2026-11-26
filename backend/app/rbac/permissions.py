@@ -8,6 +8,7 @@ Endpoints ask for a permission (see rbac/deps.py); they never compare role names
 class Permission:
     PROFILE_OWN = "profile:own"                # read and change your own account
     WATCHLIST_OWN = "watchlist:own"            # create, read, change, delete your own watchlist items
+    TEAMS_USE = "teams:use"                    # create teams and take part in teams you were added to
     REPORTS_WRITE = "reports:write"            # create, change, delete daily reports
     USERS_READ = "users:read"                  # see other users (admin dashboard)
     USERS_MANAGE = "users:manage"              # ban, unban, change roles
@@ -16,7 +17,7 @@ class Permission:
     DATA_EXPORT = "data:export"                # CSV exports
 
 
-USER_PERMISSIONS = frozenset({Permission.PROFILE_OWN, Permission.WATCHLIST_OWN})
+USER_PERMISSIONS = frozenset({Permission.PROFILE_OWN, Permission.WATCHLIST_OWN, Permission.TEAMS_USE})
 
 ADMIN_PERMISSIONS = USER_PERMISSIONS | frozenset(
     {

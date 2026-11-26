@@ -3,6 +3,7 @@ import type { AuthUser } from "../types";
 /** Same names as backend/app/rbac/permissions.py. The server decides; the UI only mirrors it. */
 export const PERMISSIONS = {
   WATCHLIST_OWN: "watchlist:own",
+  TEAMS_USE: "teams:use",
   REPORTS_WRITE: "reports:write",
   USERS_MANAGE: "users:manage",
   USERS_READ: "users:read",

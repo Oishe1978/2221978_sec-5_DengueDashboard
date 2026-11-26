@@ -63,9 +63,9 @@ def delete_item(
     item_id: UUID, request: Request, user: Owner, service: Service, db: Annotated[Session, Depends(get_session)]
 ):
     try:
-        item = service.delete(user, item_id)
+        division = service.delete(user, item_id)
     except WatchNotFoundError:
         raise NOT_FOUND
     record(db, events.RECORD_DELETE, user_id=user.id, email=user.email, ip=client_ip(request),
-           agent=user_agent(request), details=f"watchlist item {item.division}")
+           agent=user_agent(request), details=f"watchlist item {division}")
     return Response(status_code=status.HTTP_204_NO_CONTENT)
