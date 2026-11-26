@@ -17,6 +17,11 @@ def account(role: str):
 
 
 # ----- permission matrix -----
+def test_user_can_use_teams():
+    assert has_permission("user", Permission.TEAMS_USE)
+    assert has_permission("admin", Permission.TEAMS_USE)
+
+
 def test_user_can_manage_own_watchlist_but_not_reports():
     assert has_permission("user", Permission.WATCHLIST_OWN)
     assert not has_permission("user", Permission.REPORTS_WRITE)

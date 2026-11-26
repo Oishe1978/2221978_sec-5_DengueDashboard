@@ -73,7 +73,8 @@ class WatchService:
         item.updated_at = utcnow()
         return self._view(self.repo.save(item))
 
-    def delete(self, owner: User, item_id: UUID) -> WatchItem:
+    def delete(self, owner: User, item_id: UUID) -> str:
         item = self._owned(owner, item_id)
+        division = item.division             # read before the row is gone
         self.repo.remove(item)
-        return item
+        return division

@@ -12,6 +12,7 @@ from app.auth.router import router as auth_router
 from app.database import create_db_and_tables
 from app.reports.router import router as reports_router
 from app.stats.router import router as stats_router
+from app.teams.router import router as teams_router
 from app.watchlist.router import router as watchlist_router
 
 
@@ -35,6 +36,7 @@ app = FastAPI(
 app.include_router(auth_router)
 app.include_router(reports_router)
 app.include_router(stats_router)
+app.include_router(teams_router)
 app.include_router(watchlist_router)
 app.include_router(admin_router)
 

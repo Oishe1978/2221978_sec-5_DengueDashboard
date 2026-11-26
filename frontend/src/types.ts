@@ -179,3 +179,50 @@ export interface WatchUpdateInput {
   threshold?: number;
   note?: string;
 }
+
+/* ---------- teams (/api/v1/teams) ---------- */
+
+export interface MemberFlags {
+  can_create: boolean;
+  can_update: boolean;
+  can_assign: boolean;
+}
+
+export interface TeamSummary extends MemberFlags {
+  id: string;
+  name: string;
+  owner_id: string;
+  owner_name: string;
+  my_role: "owner" | "member";
+  member_count: number;
+  item_count: number;
+  created_at: string;
+}
+
+export interface TeamMember extends MemberFlags {
+  user_id: string;
+  name: string;
+  email: string;
+  is_owner: boolean;
+}
+
+export interface TeamItem {
+  id: string;
+  division: Division;
+  threshold: number;
+  note: string | null;
+  assigned_to: string | null;
+  assigned_to_name: string | null;
+  created_by_name: string;
+  created_at: string;
+  updated_at: string;
+  latest_date: string | null;
+  latest_admitted: number | null;
+  alert: boolean;
+}
+
+export interface TeamDetail {
+  team: TeamSummary;
+  members: TeamMember[];
+  items: TeamItem[];
+}
