@@ -14,12 +14,20 @@ import ReportsPage from "./pages/ReportsPage";
 import TeamPage from "./pages/TeamPage";
 import TeamsPage from "./pages/TeamsPage";
 import WatchlistPage from "./pages/WatchlistPage";
+import AdminLayout from "./pages/admin/AdminLayout";
+import OverviewTab from "./pages/admin/OverviewTab";
+import UsersTab from "./pages/admin/UsersTab";
+import UserDetailPage from "./pages/admin/UserDetailPage";
+import ContentTab from "./pages/admin/ContentTab";
+import ActivityTab from "./pages/admin/ActivityTab";
+import SecurityTab from "./pages/admin/SecurityTab";
 
 function Header() {
   const { user, loading, logout } = useAuth();
   const canWriteReports = can(user, PERMISSIONS.REPORTS_WRITE);
   const canWatch = can(user, PERMISSIONS.WATCHLIST_OWN);
   const canTeams = can(user, PERMISSIONS.TEAMS_USE);
+  const canAdmin = can(user, PERMISSIONS.USERS_READ);
   return (
     <header className="topbar">
       <span className="brand">🦟 Dengue Dashboard</span>
@@ -27,6 +35,7 @@ function Header() {
         <NavLink to="/" end>Dashboard</NavLink>
         {canWatch && <NavLink to="/watchlist">Watchlist</NavLink>}
         {canTeams && <NavLink to="/teams">Teams</NavLink>}
+        {canAdmin && <NavLink to="/admin">Admin</NavLink>}
         {canWriteReports && <NavLink to="/reports" end>Manage data</NavLink>}
         {canWriteReports && <NavLink to="/reports/new">Add report</NavLink>}
         {loading ? null : user ? (
@@ -59,6 +68,14 @@ export default function App() {
             <Route path="/watchlist" element={<RequirePermission permission={PERMISSIONS.WATCHLIST_OWN}><WatchlistPage /></RequirePermission>} />
             <Route path="/teams" element={<RequirePermission permission={PERMISSIONS.TEAMS_USE}><TeamsPage /></RequirePermission>} />
             <Route path="/teams/:id" element={<RequirePermission permission={PERMISSIONS.TEAMS_USE}><TeamPage /></RequirePermission>} />
+            <Route path="/admin" element={<RequirePermission permission={PERMISSIONS.USERS_READ}><AdminLayout /></RequirePermission>}>
+              <Route index element={<OverviewTab />} />
+              <Route path="users" element={<UsersTab />} />
+              <Route path="users/:id" element={<UserDetailPage />} />
+              <Route path="content" element={<ContentTab />} />
+              <Route path="activity" element={<ActivityTab />} />
+              <Route path="security" element={<SecurityTab />} />
+            </Route>
             <Route path="/profile" element={<RequireAuth><ProfilePage /></RequireAuth>} />
             <Route path="/reports" element={<RequirePermission permission={PERMISSIONS.REPORTS_WRITE}><ReportsPage /></RequirePermission>} />
             <Route path="/reports/new" element={<RequirePermission permission={PERMISSIONS.REPORTS_WRITE}><ReportFormPage /></RequirePermission>} />

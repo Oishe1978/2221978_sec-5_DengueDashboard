@@ -9,6 +9,7 @@ export const PERMISSIONS = {
   USERS_READ: "users:read",
   AUDIT_READ: "audit:read",
   WATCHLIST_MODERATE: "watchlist:moderate",
+  CONTENT_MODERATE: "content:moderate",
   DATA_EXPORT: "data:export",
 } as const;
 
