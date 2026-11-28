@@ -16,3 +16,5 @@ ROLE_CHANGE = "role_change"
 USER_BAN = "user_ban"
 USER_UNBAN = "user_unban"
 RECORD_DELETE = "record_delete"          # a report or a watchlist item was deleted
+EXPORT = "export"                        # a CSV file was downloaded
+SESSIONS_REVOKED = "sessions_revoked"    # an admin signed a user out everywhere

@@ -13,6 +13,7 @@ class Permission:
     USERS_READ = "users:read"                  # see other users (admin dashboard)
     USERS_MANAGE = "users:manage"              # ban, unban, change roles
     WATCHLIST_MODERATE = "watchlist:moderate"  # see and delete anybody's watchlist items
+    CONTENT_MODERATE = "content:moderate"      # list and delete anybody's reports, watchlist items and teams
     AUDIT_READ = "audit:read"                  # read the activity log
     DATA_EXPORT = "data:export"                # CSV exports
 
@@ -25,6 +26,7 @@ ADMIN_PERMISSIONS = USER_PERMISSIONS | frozenset(
         Permission.USERS_READ,
         Permission.USERS_MANAGE,
         Permission.WATCHLIST_MODERATE,
+        Permission.CONTENT_MODERATE,
         Permission.AUDIT_READ,
         Permission.DATA_EXPORT,
     }
